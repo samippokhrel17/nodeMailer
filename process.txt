@@ -1,0 +1,3 @@
+first created a node server 
+then created a database in mysql work bench 
+connedcted a database in dbConnect.js
