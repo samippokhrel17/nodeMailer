@@ -9,10 +9,26 @@ const connection = mysql.createConnection({
 
 connection.connect((err) => {
   if (err) {
-    console.error("Error connecting to Mysql server", error);
+    console.error("Error connecting to Mysql server", err);
   } else {
     console.log("Connected to Mysql database");
   }
 });
 
-module.export = connection;
+// execute any kind of query
+function executeQuery(query) {
+  return new Promise((resolve, reject) => {
+    connection.query(query, (error, results, fields) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(results);
+      }
+    });
+  });
+}
+
+module.exports = {
+  connection,
+  executeQuery,
+};
