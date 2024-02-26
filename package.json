@@ -17,6 +17,7 @@
     "mysql": "^2.18.1",
     "mysql2": "^3.9.1",
     "nodemon": "^3.0.3",
+    "redis-commander": "^0.8.0",
     "sqlstring": "^2.3.3",
     "validator": "^13.11.0"
   }

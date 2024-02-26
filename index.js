@@ -17,7 +17,7 @@ app.use(
 app.use(express.json());
 let PORT = process.env.PORT || 3000;
 
-app.use("/register", router);
+app.use("/", router);
 
 app.get("/", (req, res) => {
   res.send("hello, world!");
