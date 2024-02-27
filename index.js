@@ -7,6 +7,7 @@ const client = require("./Redis");
 const app = express();
 const connection = require("./dbConnect");
 const router = require("./Routes/router");
+// const sendMail = require("./Routes/router");
 
 // ########### --Redis-- ###########
 // const redis = require("redis");
