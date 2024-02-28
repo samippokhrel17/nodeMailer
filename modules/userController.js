@@ -114,113 +114,85 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, login };
-
-// const { executeQuery } = require("../dbConnect");
-// const bcrypt = require("bcrypt");
-// const validator = require("validator");
-// const jwt = require("jsonwebtoken");
-// const sqlString = require("sqlstring");
-
-// const registerUser = async (req, res) => {
+// const createBlog = async (req, res) => {
 //   try {
-//     console.log("received registration request:", req.body);
-//     let { firstName, lastName, email, password, phoneNumber } = req.body;
+//     const { title, content } = req.body;
 
-//     if (!firstName || !lastName || !email || !password || !phoneNumber)
-//       return res.status(400).json("All field required");
+//     // let AuthToken = req.rawHeaders[1];
 
-//     let emailCheckQuery = sqlString.format(
-//       `select count(*) as count from UserDb.user Where email = ? `,
-//       [email]
-//     );
+//     // jwt decode
 
-//     let emailCheckResult = await executeQuery(emailCheckQuery);
+//     // fetch infotmation
 
-//     if (emailCheckResult[0].count > 0) {
-//       return res.status(400).json("email already exist");
-//     }
-//     let phoneNumberCheckQuery = sqlString.format(
-//       `select count(*) as count from UserDb.user Where phoneNumber = ? `,
-//       [phoneNumber]
-//     );
+//     // datbase sanga data info xa ki xaina vanera check garna paryo
 
-//     let phoneNumberCheckResult = await executeQuery(phoneNumberCheckQuery);
+//     //xa vane ok vannne xaina vane vayena vanerta message phatauna paryo
 
-//     if (phoneNumberCheckResult[0].count > 0) {
-//       return res.status(400).json("Phone Number already exist");
-//     }
-//     const salt = await bcrypt.genSalt(1);
+//     //xa vane create garna janneeeeeee
+//     // const userId = req.user.id;
 
-//     let hashpassword = await bcrypt.hash(password, salt);
+//     if (!title || !content)
+//       return res.status(400).json("title and content are required");
 
-//     //to insert data into database creating an objects with user infotmation
 //     let insertObject = {
-//       firstName: firstName,
-//       lastName: lastName,
-//       email: email,
-//       password: hashpassword,
-//       phoneNumber: phoneNumber,
+//       title: title,
+//       content: content,
 //     };
-
-//     let query = sqlString.format(`Insert into UserDb.user SET ?`, [
+//     let query = sqlString.format(`INSERT INTO UserDb.blog SET ?`, [
 //       insertObject,
 //     ]);
 
 //     let result = await executeQuery(query);
 
-//     console.log("Database operation result:", result);
+//     console.log("database operation result:", result);
 
-//     if (result.affectedRows > 0) return res.status(200).send("Success");
-//     return res.status(200).send("successfully inserted");
+//     if (result.affectedRows > 0)
+//       return res.status(200).send("Blog created successfully");
+//     return res.status(200).send("Successfully inserted");
 //   } catch (error) {
 //     console.log(error);
 //     return res.status(500).json(error);
 //   }
 // };
 
-// const login = async (req, res) => {
-//   try {
-//     const { email, password } = req.body;
+const createBlog = async (req, res) => {
+  try {
+    const { title, content } = req.body;
 
-//     if (!email || !password)
-//       return res.status(400).json("Email and password are required");
+    // user authentication using jwt token
+    const token = req.headers.authorization;
+    if (!token) {
+      return res.status(401).json("Authentication required");
+    }
+    //user id from jwt token
+    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    const userId = decodedToken.userId;
 
-//     let emailCheckQuery = sqlString.format(
-//       `SELECT * FROM UserDb.user WHERE email = ?`,
-//       [email]
-//     );
+    if (!title || !content) {
+      return res.status(400).json("Title and content are required");
+    }
 
-//     let user = await executeQuery(emailCheckQuery);
+    let insertObject = {
+      title: title,
+      content: content,
+      userId: userId,
+    };
+    let query = sqlString.format(`INSERT INTO UserDb.blog SET ?`, [
+      insertObject,
+    ]);
 
-//     if (user.length === 0) {
-//       return res.status(404).json("User not found");
-//     }
+    let result = await executeQuery(query);
 
-//     const hashedPassword = user[0].password;
+    console.log("Database operation result:", result);
 
-//     const passwordMatch = await bcrypt.compare(password, hashedPassword);
+    if (result.affectedRows > 0) {
+      return res.status(200).send("Blog created successfully");
+    }
+    return res.status(500).send("Failed to create blog");
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(error);
+  }
+};
 
-//     if (!passwordMatch) {
-//       return res.status(401).json("Invalid password");
-//     }
-
-//     // User authenticated, generate JWT token
-//     const token = jwt.sign({ userId: user[0].id }, process.env.JWT_SECRET, {
-//       expiresIn: "1h",
-//     });
-
-//     return res.status(200).json({
-//       firstName: user[0].firstName,
-//       lastName: user[0].lastName,
-//       mobileNumber: user[0].phoneNumber,
-//       email: user[0].email,
-//       token,
-//     });
-//   } catch (error) {
-//     console.log(error);
-//     return res.status(500).json(error);
-//   }
-// };
-
-// module.exports = { registerUser, login };
+module.exports = { registerUser, login, createBlog };
